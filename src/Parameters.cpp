@@ -21,7 +21,8 @@
 
 namespace kc1fsz {
 
-static constexpr uint8_t MASKS[8] = { 1, 2, 4, 8, 16, 32, 64, 128 };
+static constexpr uint8_t LSB_FIRST_MASKS[8] = { 1, 2, 4, 8, 16, 32, 64, 128 };
+static constexpr uint8_t MSB_FIRST_MASKS[8] = { 128, 64, 32, 16, 8, 4, 2, 1 };
 
 PackingState::PackingState()
 :   bitPtr(0),
@@ -112,8 +113,13 @@ bool Parameters::isEqualTo(const Parameters& other) const {
         subSegs[3].isEqualTo(other.subSegs[3]);
 }
 
+/**
+ * Please see https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.11
+ * 
+ * IMPORTANT: Packing begins from the most significant bit!
+ */
 bool Parameters::isValidFrame(const uint8_t* buf) {
-    return (*buf & 0x0f) == 0x0d;
+    return (*buf & 0xf0) == 0xd0;
 }
 
 /**
@@ -137,7 +143,7 @@ void Parameters::pack(uint8_t* packArea, PackingState* state) const {
 }
 
 /**
- * Please see https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.1
+ * Please see https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.11
  */
 void Parameters::unpack(const uint8_t* packArea, PackingState* state) {        
     // Discard the 0x0d signature
@@ -156,16 +162,23 @@ void Parameters::unpack(const uint8_t* packArea, PackingState* state) {
     subSegs[3].unpack(packArea, state);
 }
 
+/**
+ * Please see https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.11
+ * 
+ * IMPORTANT: Packing begins from the most significant bit!
+ */
 void Parameters::pack1(uint8_t* packArea, PackingState* state, uint16_t parameter, 
     uint16_t bits) {
     uint8_t work = (uint8_t)(parameter & 0xff);
+    // We mask starting on the high bit and move down to the low bit
+    uint8_t mask = 1 << (bits - 1);
     for (uint16_t b = 0; b < bits; b++) {
-        if (work & 1) {
-            packArea[state->bytePtr] |= MASKS[state->bitPtr];
+        if (work & mask) {
+            packArea[state->bytePtr] |= MSB_FIRST_MASKS[state->bitPtr];
         } else {
-            packArea[state->bytePtr] &= ~MASKS[state->bitPtr];
+            packArea[state->bytePtr] &= ~MSB_FIRST_MASKS[state->bitPtr];
         }
-        work >>= 1;
+        mask >>= 1;
         state->bitPtr++;
         // Look for the wrap to the next byte
         if (state->bitPtr == 8) {
@@ -178,8 +191,9 @@ void Parameters::pack1(uint8_t* packArea, PackingState* state, uint16_t paramete
 uint8_t Parameters::unpack1(const uint8_t* stream, PackingState* streamState, uint16_t bits) {
     uint8_t work = 0;
     for (uint16_t b = 0; b < bits; b++) {
-        if (stream[streamState->bytePtr] & MASKS[streamState->bitPtr]) {
-            work |= MASKS[b];
+        work <<= 1;
+        if (stream[streamState->bytePtr] & MSB_FIRST_MASKS[streamState->bitPtr]) {
+            work |= 1;
         }
         streamState->bitPtr++;
         // Look for the wrap to the next byte

@@ -42,10 +42,10 @@ static void pack_tests() {
         uint8_t area[2] = { 0, 0 };
         // Pack two parameters and make sure they go to the right place
         Parameters::pack1(area, &state, 0b101, 3);
-        assert(area[0] == 0b00000101);
+        assert(area[0] == 0b10100000);
         Parameters::pack1(area, &state, 0b01010101, 8);
-        assert(area[0] == 0b10101101);
-        assert(area[1] == 0b00000010);
+        assert(area[0] == 0b10101010);
+        assert(area[1] == 0b10100000);
         
         state.reset();
         assert(Parameters::unpack1(area, &state, 3) == 0b101);
