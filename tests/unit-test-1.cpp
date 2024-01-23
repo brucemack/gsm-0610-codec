@@ -58,11 +58,14 @@ static void pack_tests() {
         uint8_t area[33];
         Parameters parms;
         parms.pack(area, &state);
-        assert(state.bitsUsed() == 260);
+        assert(state.bitsUsed() == 264);
+        assert(Parameters::isValidFrame(area));
 
-        state.reset();
-        parms.unpack(area, &state);
-        assert(state.bitsUsed() == 260);
+        PackingState state2;
+        Parameters parms2;
+        parms2.unpack(area, &state2);
+        assert(state2.bitsUsed() == 264);
+        assert(parms2.isEqualTo(parms));
    }
 
 }

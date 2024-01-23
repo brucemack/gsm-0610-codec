@@ -45,6 +45,8 @@ public:
 class SubSegParameters {
 public:
 
+    SubSegParameters();
+
     uint16_t Nc;
     uint16_t bc;
     uint16_t Mc;
@@ -58,6 +60,7 @@ public:
      * Please see table 1.1 on page 11 for full information.
     */
     void pack(uint8_t* stream, PackingState* streamState) const;
+    
     void unpack(const uint8_t* stream, PackingState* streamState);
 };
 
@@ -70,6 +73,8 @@ public:
 class Parameters {
 public:
 
+    Parameters();
+
     uint16_t LARc[8];
     SubSegParameters subSegs[4];
 
@@ -78,12 +83,22 @@ public:
     /**
      * This function will write 33 bytes of the stream area, so the caller 
      * is responsible for making sure that space is available.
-    */
+     * 
+     * This follows RFC 3551 in section 4.5.8.1
+     * 
+     * https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.1
+     */
     void pack(uint8_t* stream, PackingState* streamState) const;
+
+    static bool isValidFrame(const uint8_t* buf);
 
     /**
      * This function will read 33 bytes of the stream area, so the caller
      * is responsible for making sure that the space is available.
+     * 
+     * This follows RFC 3551 in section 4.5.8.1
+     * 
+     * https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.1
      */    
     void unpack(const uint8_t* stream, PackingState* streamState);
 

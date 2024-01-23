@@ -37,6 +37,16 @@ void PackingState::reset() {
     bytePtr = 0;
 }
 
+SubSegParameters::SubSegParameters()
+:   Nc(0),
+    bc(0),
+    Mc(0),
+    xmaxc(0) {
+    for (uint16_t i = 0; i < 13; i++) {
+        xMc[i] = 0;
+    }
+}
+
 bool SubSegParameters::isEqualTo(const SubSegParameters& other) const {
     return Nc == other.Nc &&
         bc == other.bc &&
@@ -59,9 +69,9 @@ bool SubSegParameters::isEqualTo(const SubSegParameters& other) const {
 
 /**
  * Packs the sub-segment parameters into the specified area.
- * Please see table 1.1 on page 11 for full information.
-*/
-void SubSegParameters::pack(uint8_t* packArea, PackingState* state) const {        
+ * Please see https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.1
+ */
+void SubSegParameters::pack(uint8_t* packArea, PackingState* state) const {
     Parameters::pack1(packArea, state, Nc, 7);
     Parameters::pack1(packArea, state, bc, 2);
     Parameters::pack1(packArea, state, Mc, 2);
@@ -81,6 +91,10 @@ void SubSegParameters::unpack(const uint8_t* stream, PackingState* streamState) 
     }
 }
 
+Parameters::Parameters() {
+    for (uint16_t i = 0; i < 8; i++) 
+        LARc[i] = 0;
+}
 
 bool Parameters::isEqualTo(const Parameters& other) const {
     return 
@@ -98,7 +112,16 @@ bool Parameters::isEqualTo(const Parameters& other) const {
         subSegs[3].isEqualTo(other.subSegs[3]);
 }
 
+bool Parameters::isValidFrame(const uint8_t* buf) {
+    return (*buf & 0x0f) == 0x0d;
+}
+
+/**
+ * Please see https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.1
+ */
 void Parameters::pack(uint8_t* packArea, PackingState* state) const {        
+    // There is a hard-coded "0x0d" in the first nibble
+    Parameters::pack1(packArea, state, 0x0d, 4);
     pack1(packArea, state, LARc[0], 6);
     pack1(packArea, state, LARc[1], 6);
     pack1(packArea, state, LARc[2], 5);
@@ -113,7 +136,12 @@ void Parameters::pack(uint8_t* packArea, PackingState* state) const {
     subSegs[3].pack(packArea, state);
 }
 
+/**
+ * Please see https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.1
+ */
 void Parameters::unpack(const uint8_t* packArea, PackingState* state) {        
+    // Discard the 0x0d signature
+    Parameters::unpack1(packArea, state, 4);
     LARc[0] = unpack1(packArea, state, 6);
     LARc[1] = unpack1(packArea, state, 6);
     LARc[2] = unpack1(packArea, state, 5);

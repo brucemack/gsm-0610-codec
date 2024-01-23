@@ -20,6 +20,9 @@ There is also an important data directory that contains the official tests seque
 
 Background on Issai Shur: https://en.wikipedia.org/wiki/Issai_Schur
 
+The method of packing a GSM frame into an RTP packet is described in RFC 3551.  There may be other 
+formats used in other contexts, so support may need to be expanded.  The RFC is here: https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.1
+
 Licensing 
 =========
 
