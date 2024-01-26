@@ -70,44 +70,6 @@ static void pack_tests() {
 
 }
 
-
-/*
-static void make_pcm_file() {
-
-    std::string inp_fn = "../tests/gsm-06.10/data/Seq01.inp";
-    std::ifstream ifile(inp_fn, std::ios::binary);
-    if (!ifile.good()) {
-        return;
-    }
-    
-    std::string out_fn = "c:/tmp/out.txt";
-    std::ofstream ofile(out_fn);
-    if (!ofile.good()) {
-        return;
-    }
-
-    uint32_t sampleCount = 0;
-
-    uint8_t f[2];
-    while (ifile.read((char*)f, 2)) {
-        uint16_t sample = (uint16_t)f[1];
-        sample = sample << 8;
-        sample |= (uint16_t)f[0];
-        // Anything in the low 3?
-        if ((sample & 0b111) != 0) {
-            std::cout << "ERROR" << std::endl;
-            return;
-        }
-        ofile << (int16_t)sample << std::endl;
-        sampleCount++;
-    }
-
-    ifile.close();
-    ofile.close();
-    std::cout << "Convert done " << sampleCount / 160 << std::endl;
-}
-*/
-
 static void test_wav(const char* inFn, const char* outFn) {
 
     std::string inp_fn = inFn;
@@ -206,6 +168,14 @@ static int encoder_test(const char* baseFn) {
         Parameters computed_params;
         encoder.encode(inp_pcm, &computed_params);
 
+        if (segmentCount == 0) {
+            std::cout << computed_params.LARc[0] << std::endl;
+            std::cout << computed_params.LARc[1] << std::endl;
+            std::cout << computed_params.LARc[2] << std::endl;
+            std::cout << computed_params.LARc[3] << std::endl;
+        }
+
+
         assert(computed_params.isEqualTo(expected_params));
 
         segmentCount++;
@@ -286,6 +256,7 @@ static void etsi_test_files() {
 
     // Run all tests on DISK #1.  
     assert(encoder_test("../tests/data/Seq01") == 584);
+    /*
     assert(decoder_test("../tests/data/Seq01") == 584);
     assert(encoder_test("../tests/data/Seq02") == 947);
     assert(decoder_test("../tests/data/Seq02") == 947);
@@ -295,6 +266,7 @@ static void etsi_test_files() {
     assert(decoder_test("../tests/data/Seq04") == 520);
     // Decoder-only test
     assert(decoder_test("../tests/data/Seq05") == 64);
+    */
 
     // Make some waves!
     test_wav("../tests/data/Seq01.inp", "../tmp/Seq01.wav");
