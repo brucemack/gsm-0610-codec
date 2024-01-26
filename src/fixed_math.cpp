@@ -156,11 +156,14 @@ int32_t L_mult(int16_t var1, int16_t var2) {
 int32_t L_add(int32_t L_var1, int32_t L_var2) {
     // Here we use the platform support:
 
+#ifdef PICO_BUILD
     // CHANGED ON PI PICO - For some reason int32_t and int are 
     // not compatible on the platform, even though they are 
     // the same length.
-    //int32_t L_res;
     int L_res;
+#else
+    int32_t L_res;
+#endif
 
     bool of = __builtin_sadd_overflow(L_var1, L_var2, &L_res);
     // On overflow we can saturate the result
@@ -185,11 +188,14 @@ int32_t L_add(int32_t L_var1, int32_t L_var2) {
 int32_t L_sub(int32_t L_var1, int32_t L_var2) {
     // Here we use the platform support:
 
+#ifdef PICO_BUILD
     // CHANGED ON PI PICO - For some reason int32_t and int are 
     // not compatible on the platform, even though they are 
     // the same length.
-    //int32_t L_res;
     int L_res;
+#else
+    int32_t L_res;
+#endif
 
     bool of = __builtin_ssub_overflow(L_var1, L_var2, &L_res);
     // On overflow we can saturate the result
