@@ -16,8 +16,10 @@
 #
 # NOT FOR COMMERCIAL USE WITHOUT PERMISSION.
 
+set(TARGET2 "pico")
+
 cmake_minimum_required(VERSION 3.13)
-if (TARGET_GROUP STREQUAL pico)
+if (TARGET2 STREQUAL "pico")
 include(pico_sdk_import.cmake)
 endif()
 project(gsm-0610-codec C CXX ASM)
@@ -25,11 +27,12 @@ set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
 file(MAKE_DIRECTORY tmp)
 
-if (TARGET_GROUP STREQUAL pico)
+if (TARGET2 STREQUAL "pico")
 pico_sdk_init()
-add_compile_options(-fstack-protector-all -Wall -Wpedantic -g)
+#add_compile_options(-fstack-protector-all -Wall -g -DPICO_BUILD=1)
+add_compile_options(-DPICO_BUILD=1)
 else()
-add_compile_options(-fstack-protector-all -Wall -Wpedantic -g)
+#add_compile_options(-fstack-protector-all -Wall -Wpedantic -g)
 endif()
 
 # ----- gsm-test-0 -----------------------------------------------------------
@@ -47,11 +50,10 @@ add_executable(gsm-test-0
 target_include_directories(gsm-test-0 PUBLIC include)
 target_include_directories(gsm-test-0 PRIVATE src)
 
-if (TARGET_GROUP STREQUAL pico)
+if (TARGET2 STREQUAL "pico")
 pico_enable_stdio_usb(gsm-test-0 1)
 pico_enable_stdio_uart(gsm-test-0 1)
-target_compile_definitions(gsm-test-0 PUBLIC PICO_BUILD=1)
-target_link_libraries(gsm-test-0 pico_stdlib hardware_i2c hardware_adc pico_multicore)
+target_link_libraries(gsm-test-0 pico_stdlib hardware_i2c)
 endif()
 
 # ----- gsm-test-1 -----------------------------------------------------------
@@ -68,3 +70,11 @@ add_executable(gsm-test-1
 
 target_include_directories(gsm-test-1 PUBLIC include)
 target_include_directories(gsm-test-1 PRIVATE src)
+
+add_executable(main
+  main.c
+)
+
+pico_enable_stdio_usb(main 1)
+pico_enable_stdio_uart(main 1)
+target_link_libraries(main pico_stdlib hardware_i2c)

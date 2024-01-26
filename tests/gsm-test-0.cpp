@@ -36,6 +36,9 @@ using namespace kc1fsz;
 
 static void math_tests() {
 
+    assert(sizeof(int32_t) == 4);
+    assert(sizeof(int) == 4);
+
     // A quick demo of the quantization used in section 3.1.7. We start with 
     // a number pre-scaled by 1/64.  An additional 9 shifts allows the 
     // q15 value to be treated like an integer - works for negatives as well.
@@ -261,7 +264,14 @@ static void platform_init() {
 }
 
 int main(int, const char**) {
+
     platform_init();
+
+    cout << "Running tests" << endl;
     math_tests();
-    cout << "Tests completed!" << endl;
+    cout << "Done" << endl;
+
+    while(true) {
+        sleep_ms(100);
+    }
 }
