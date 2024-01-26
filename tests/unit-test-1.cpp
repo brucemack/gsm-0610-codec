@@ -168,20 +168,10 @@ static int encoder_test(const char* baseFn) {
         Parameters computed_params;
         encoder.encode(inp_pcm, &computed_params);
 
-        if (segmentCount == 0) {
-            std::cout << computed_params.LARc[0] << std::endl;
-            std::cout << computed_params.LARc[1] << std::endl;
-            std::cout << computed_params.LARc[2] << std::endl;
-            std::cout << computed_params.LARc[3] << std::endl;
-        }
-
-
         assert(computed_params.isEqualTo(expected_params));
 
         segmentCount++;
     }
-
-    //assert(segmentCount == 584);
 
     inp_file.close();
     cod_file.close();
@@ -256,7 +246,6 @@ static void etsi_test_files() {
 
     // Run all tests on DISK #1.  
     assert(encoder_test("../tests/data/Seq01") == 584);
-    /*
     assert(decoder_test("../tests/data/Seq01") == 584);
     assert(encoder_test("../tests/data/Seq02") == 947);
     assert(decoder_test("../tests/data/Seq02") == 947);
@@ -266,8 +255,7 @@ static void etsi_test_files() {
     assert(decoder_test("../tests/data/Seq04") == 520);
     // Decoder-only test
     assert(decoder_test("../tests/data/Seq05") == 64);
-    */
-
+    
     // Make some waves!
     test_wav("../tests/data/Seq01.inp", "../tmp/Seq01.wav");
     test_wav("../tests/data/Seq02.inp", "../tmp/Seq02.wav");
