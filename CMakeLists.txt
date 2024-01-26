@@ -17,12 +17,45 @@
 # NOT FOR COMMERCIAL USE WITHOUT PERMISSION.
 
 cmake_minimum_required(VERSION 3.13)
-project(radlib C CXX ASM)
+if (TARGET_GROUP STREQUAL pico)
+include(pico_sdk_import.cmake)
+endif()
+project(gsm-0610-codec C CXX ASM)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 17)
-add_compile_options(-fstack-protector-all -Wall -Wpedantic -g)
-
 file(MAKE_DIRECTORY tmp)
+
+if (TARGET_GROUP STREQUAL pico)
+pico_sdk_init()
+add_compile_options(-fstack-protector-all -Wall -Wpedantic -g)
+else()
+add_compile_options(-fstack-protector-all -Wall -Wpedantic -g)
+endif()
+
+# ----- gsm-test-0 -----------------------------------------------------------
+# Very basic unit test which would be expected to pass on the 
+# embedded platform.
+
+add_executable(gsm-test-0
+  tests/gsm-test-0.cpp
+  src/fixed_math.cpp
+  src/Parameters.cpp
+  src/Encoder.cpp
+  src/Decoder.cpp
+)
+
+target_include_directories(gsm-test-0 PUBLIC include)
+target_include_directories(gsm-test-0 PRIVATE src)
+
+if (TARGET_GROUP STREQUAL pico)
+pico_enable_stdio_usb(gsm-test-0 1)
+pico_enable_stdio_uart(gsm-test-0 1)
+target_compile_definitions(gsm-test-0 PUBLIC PICO_BUILD=1)
+target_link_libraries(gsm-test-0 pico_stdlib hardware_i2c hardware_adc pico_multicore)
+endif()
+
+# ----- gsm-test-1 -----------------------------------------------------------
+# A more complex test case that will require the desktop environment
 
 add_executable(gsm-test-1
   tests/unit-test-1.cpp
@@ -35,7 +68,3 @@ add_executable(gsm-test-1
 
 target_include_directories(gsm-test-1 PUBLIC include)
 target_include_directories(gsm-test-1 PRIVATE src)
-
-
-
-
