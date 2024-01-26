@@ -24,6 +24,11 @@
 #include <fstream>
 #include <cstring>
 
+#ifdef PICO_BUILD
+#include "pico/stdlib.h"
+const uint LED_PIN = 25;
+#endif
+
 #include "fixed_math.h"
 
 using namespace std;
@@ -241,6 +246,22 @@ static void math_tests() {
     }
 }
 
+static void platform_init() {
+#ifdef PICO_BUILD
+    stdio_init_all();
+
+    gpio_init(LED_PIN);
+    gpio_set_dir(LED_PIN, GPIO_OUT);
+        
+    gpio_put(LED_PIN, 1);
+    sleep_ms(1000);
+    gpio_put(LED_PIN, 0);
+    sleep_ms(1000);
+#endif
+}
+
 int main(int, const char**) {
+    platform_init();
     math_tests();
+    cout << "Tests completed!" << endl;
 }
