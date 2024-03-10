@@ -142,6 +142,11 @@ void Parameters::pack(uint8_t* packArea, PackingState* state) const {
     subSegs[3].pack(packArea, state);
 }
 
+void Parameters::pack(uint8_t* packArea) const {        
+    PackingState state;
+    pack(packArea, &state);
+}
+
 /**
  * Please see https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.11
  */
@@ -160,6 +165,11 @@ void Parameters::unpack(const uint8_t* packArea, PackingState* state) {
     subSegs[1].unpack(packArea, state);
     subSegs[2].unpack(packArea, state);
     subSegs[3].unpack(packArea, state);
+}
+
+void Parameters::unpack(const uint8_t* packArea) {        
+    PackingState state;
+    unpack(packArea, &state);
 }
 
 /**

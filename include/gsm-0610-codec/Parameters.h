@@ -90,6 +90,11 @@ public:
      */
     void pack(uint8_t* stream, PackingState* streamState) const;
 
+    /**
+     * Same as above, but packing state is internal.
+     */
+    void pack(uint8_t* stream) const;
+
     static bool isValidFrame(const uint8_t* buf);
 
     /**
@@ -101,6 +106,11 @@ public:
      * https://datatracker.ietf.org/doc/html/rfc3551#section-4.5.8.1
      */    
     void unpack(const uint8_t* stream, PackingState* streamState);
+
+    /**
+     * Same as above, but packing state is internal.
+     */
+    void unpack(const uint8_t* stream);
 
     /**
      * Packs one parameter to the specified stream.

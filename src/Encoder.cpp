@@ -97,6 +97,7 @@ void Encoder::encode(const int16_t sop[], Parameters* output) {
     int16_t K[9];
     int32_t L_temp;
 
+    /*
     // Section 5.2.1 - Scaling of the input variable
     for (uint16_t k = 0; k <= 159; k++) {
         // Shift away the 3 low-order (don't care) bits
@@ -104,9 +105,15 @@ void Encoder::encode(const int16_t sop[], Parameters* output) {
         // Back in q15 format divided by two
         so[k] = so[k] << 2;
     }
+    */
 
+    // Section 5.2.1 - Scaling of the input variable
     // Section 5.2.2 - Offset compensation
     for (uint16_t k = 0; k <= 159; k++) {
+
+        // Shift away the 3 low-order (don't care) bits
+        // Back in q15 format divided by two
+        so[k] = sop[k] >> 1;
 
         // Compute the non-recursive part
         s1 = sub(so[k], _z1);
