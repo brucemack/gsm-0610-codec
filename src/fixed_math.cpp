@@ -156,6 +156,7 @@ int32_t L_mult(int16_t var1, int16_t var2) {
 int32_t L_add(int32_t L_var1, int32_t L_var2) {
     // Here we use the platform support:
 
+/*
 #ifdef PICO_BUILD
     // CHANGED ON PI PICO - For some reason int32_t and int are 
     // not compatible on the platform, even though they are 
@@ -164,6 +165,9 @@ int32_t L_add(int32_t L_var1, int32_t L_var2) {
 #else
     int32_t L_res;
 #endif
+*/
+    // BRM 2025-02-01 - Switching default to int
+    int L_res;
 
     bool of = __builtin_sadd_overflow(L_var1, L_var2, &L_res);
     // On overflow we can saturate the result
